@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Responsive Centered Box</title>
+  </head>
+  <body class="flex items-center justify-center h-screen bg-gray-200 p-4">
+    <div
+      class="w-4/6 bg-white rounded-lg shadow-lg p-5 flex flex-col md:flex-row"
+    >
+      <!-- Sidebar Steps -->
+      <div
+        class="w-full md:w-1/4 bg-[url('/images/background.jpg')] text-white p-8 flex justify-left rounded-lg"
+      >
+        <div class="flex flex-col space-y-5">
+          <!-- Step 1 -->
+          <div
+            id="item1"
+            class="step flex items-center space-x-3 pt-3"
+            data-step="1"
+          >
+            <span class="step-circle">1</span>
+            <div class="flex flex-col">
+              <p class="step-title">Step 1</p>
+              <p class="step-description">Your info</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div
+            id="item2"
+            class="step flex items-center space-x-3 pt-3"
+            data-step="2"
+          >
+            <span class="step-circle">2</span>
+            <div class="flex flex-col">
+              <p class="step-title">Step 2</p>
+              <p class="step-description">Select plan</p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div
+            id="item3"
+            class="step flex items-center space-x-3 pt-3"
+            data-step="3"
+          >
+            <span class="step-circle">3</span>
+            <div class="flex flex-col">
+              <p class="step-title">Step 3</p>
+              <p class="step-description">Add-ons</p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div
+            id="item4"
+            class="step flex items-center space-x-3 pt-3"
+            data-step="4"
+          >
+            <span class="step-circle">4</span>
+            <div class="flex flex-col">
+              <p class="step-title">Step 4</p>
+              <p class="step-description">Summary</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div
+        id="content"
+        class="mx-auto w-full md:w-2/3 text-black p-4 flex items-center justify-center"
+      ></div>
+    </div>
+
+    <script>
+      const steps = [
+        { id: "item1", file: "component/info.html" },
+        { id: "item2", file: "component/plan.html" },
+        { id: "item3", file: "component/addons.html" },
+        { id: "item4", file: "component/summary.html" },
+      ];
+
+      let currentStep = localStorage.getItem("currentStep")
+        ? parseInt(localStorage.getItem("currentStep"))
+        : 1;
+
+      function loadContent(step) {
+        const stepData = steps.find((s) => s.id === `item${step}`);
+        if (!stepData) return;
+
+        fetch(stepData.file)
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById("content").innerHTML = data;
+            updateActiveStep(step);
+            localStorage.setItem("currentStep", step); // Store step in localStorage
+
+            // Extract and execute scripts
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, "text/html");
+            const scripts = doc.querySelectorAll("script");
+
+            scripts.forEach((script) => {
+              const newScript = document.createElement("script");
+              if (script.src) {
+                newScript.src = script.src;
+              } else {
+                newScript.textContent = script.textContent;
+              }
+              document.body
+                .appendChild(newScript)
+                .parentNode.removeChild(newScript);
+            });
+          })
+          .catch((error) => console.error("Error loading content:", error));
+      }
+
+      function updateActiveStep(step) {
+        document.querySelectorAll(".step").forEach((stepEl) => {
+          const stepCircle = stepEl.querySelector(".step-circle");
+          if (stepCircle) {
+            stepCircle.classList.remove("bg-white", "text-black");
+            stepCircle.classList.add(
+              "bg-opacity-20",
+              "border-white",
+              "text-white"
+            );
+          }
+        });
+
+        const activeStep = document.getElementById(`item${step}`);
+        if (activeStep) {
+          const activeCircle = activeStep.querySelector(".step-circle");
+          if (activeCircle) {
+            activeCircle.classList.add("bg-white", "text-black");
+            activeCircle.classList.remove(
+              "bg-opacity-20",
+              "border-white",
+              "text-white"
+            );
+          }
+        }
+
+        currentStep = step;
+      }
+
+      document.querySelectorAll(".step").forEach((stepEl) => {
+        stepEl.addEventListener("click", function () {
+          const step = parseInt(this.dataset.step);
+          loadContent(step);
+        });
+      });
+
+      document.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (currentStep < steps.length) {
+          loadContent(currentStep + 1);
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (event.target.matches(".prev-button")) {
+          if (currentStep > 1) {
+            loadContent(currentStep - 1);
+          }
+        }
+      });
+
+      // Load the last visited step on page load
+      loadContent(currentStep);
+    </script>
+
+    <style>
+      .step-circle {
+        border: 1px solid white;
+        text-align: center;
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-weight: 500;
+        transition: background 0.3s, color 0.3s;
+        padding: 20px;
+        margin-right: 15px;
+      }
+      .step-description {
+        text-transform: uppercase;
+        font-weight: 700;
+      }
+      .step-title {
+        font-weight: 200;
+        text-transform: uppercase;
+      }
+      .step:hover .step-circle {
+        background: white;
+        color: black;
+      }
+    </style>
+  </body>
+</html>

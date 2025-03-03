@@ -1,0 +1,168 @@
+<form class="bg-white p-6 rounded-lg shadow-lg max-w-md md:max-w-3xl w-full">
+  <!-- Title -->
+  <h2 class="text-2xl font-bold text-gray-900 text-center">Select your plan</h2>
+  <p class="text-gray-500 text-center mb-6">
+    You have the option of monthly or yearly billing.
+  </p>
+
+  <!-- Plan Selection -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <label
+      class="plan border rounded-lg p-4 flex flex-col items-center cursor-pointer hover:border-blue-500 transition-all duration-200"
+      data-plan="arcade"
+    >
+      <input type="radio" name="plan" value="arcade" class="hidden" checked />
+      <div
+        class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center"
+      >
+        <img src="/images/joystick.png" alt="Arcade Icon" class="w-6 h-6" />
+      </div>
+      <p class="font-bold text-gray-900 mt-10">Arcade</p>
+      <p class="price text-gray-500">$9/mo</p>
+      <p class="yearly-bonus text-blue-600 text-sm mt-1 hidden">
+        2 months free
+      </p>
+    </label>
+
+    <label
+      class="plan border rounded-lg p-4 flex flex-col items-center cursor-pointer hover:border-blue-500 transition-all duration-200"
+      data-plan="advanced"
+    >
+      <input type="radio" name="plan" value="advanced" class="hidden" />
+      <div
+        class="w-12 h-12 bg-red-200 rounded-full flex items-center justify-center"
+      >
+        <img src="/images/advanced.png" alt="Advanced Icon" class="w-6 h-6" />
+      </div>
+      <p class="font-bold text-gray-900 mt-10">Advanced</p>
+      <p class="price text-gray-500">$12/mo</p>
+      <p class="yearly-bonus text-blue-600 text-sm mt-1 hidden">
+        2 months free
+      </p>
+    </label>
+
+    <label
+      class="plan border rounded-lg p-4 flex flex-col items-center cursor-pointer hover:border-blue-500 transition-all duration-200"
+      data-plan="pro"
+    >
+      <input type="radio" name="plan" value="pro" class="hidden" />
+      <div
+        class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center"
+      >
+        <img src="/images/pro.png" alt="Pro Icon" class="w-6 h-6" />
+      </div>
+      <p class="font-bold text-gray-900 mt-10">Pro</p>
+      <p class="price text-gray-500">$15/mo</p>
+      <p class="yearly-bonus text-blue-600 text-sm mt-1 hidden">
+        2 months free
+      </p>
+    </label>
+  </div>
+
+  <!-- Billing Toggle -->
+  <div
+    class="flex mt-16 items-center justify-center gap-4 mb-6 bg-gray-200 p-2 rounded-lg"
+  >
+    <span id="monthlyLabel" class="text-sm font-bold text-gray-700"
+      >Monthly</span
+    >
+    <label class="relative inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        id="billingToggle"
+        class="sr-only peer"
+        aria-label="Toggle billing period"
+      />
+      <div
+        class="w-11 h-6 bg-gray-300 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+      ></div>
+    </label>
+    <span id="yearlyLabel" class="text-sm text-gray-700">Yearly</span>
+  </div>
+
+  <!-- Buttons -->
+  <div class="flex justify-between">
+    <button
+      type="button"
+      id="goBackBtn"
+      class="text-blue-700 font-bold hover:underline"
+    >
+      Go Back
+    </button>
+    <button
+      type="submit"
+      class="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition"
+    >
+      Next Step
+    </button>
+  </div>
+</form>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("billingToggle");
+    const monthlyLabel = document.getElementById("monthlyLabel");
+    const yearlyLabel = document.getElementById("yearlyLabel");
+    const plans = document.querySelectorAll(".plan");
+    const goBackBtn = document.getElementById("goBackBtn");
+
+    const prices = {
+      monthly: { arcade: "$9/mo", advanced: "$12/mo", pro: "$15/mo" },
+      yearly: { arcade: "$90/yr", advanced: "$120/yr", pro: "$150/yr" },
+    };
+
+    function updatePricing(isYearly) {
+      plans.forEach((plan) => {
+        const planType = plan.getAttribute("data-plan");
+        const priceElement = plan.querySelector(".price");
+        const yearlyBonusElement = plan.querySelector(".yearly-bonus");
+
+        if (planType && priceElement) {
+          priceElement.textContent = isYearly
+            ? prices.yearly[planType]
+            : prices.monthly[planType];
+        }
+
+        if (yearlyBonusElement) {
+          yearlyBonusElement.classList.toggle("hidden", !isYearly);
+        }
+      });
+
+      monthlyLabel.classList.toggle("font-bold", !isYearly);
+      yearlyLabel.classList.toggle("font-bold", isYearly);
+    }
+
+    function updateSelectedPlan() {
+      plans.forEach((plan) => {
+        plan.classList.remove("border-blue-500");
+      });
+      const selectedPlan = document
+        .querySelector('input[name="plan"]:checked')
+        .closest(".plan");
+      if (selectedPlan) {
+        selectedPlan.classList.add("border-blue-500");
+      }
+    }
+
+    toggle.addEventListener("change", function () {
+      updatePricing(this.checked);
+    });
+
+    plans.forEach((plan) => {
+      plan.addEventListener("click", function () {
+        this.querySelector('input[type="radio"]').checked = true;
+        updateSelectedPlan();
+      });
+    });
+
+    goBackBtn.addEventListener("click", function () {
+      if (currentStep > 1) {
+        loadContent(currentStep - 1);
+      }
+    });
+
+    // Initialize pricing and selected plan on page load
+    updatePricing(toggle.checked);
+    updateSelectedPlan();
+  });
+</script>
