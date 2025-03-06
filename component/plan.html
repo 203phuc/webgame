@@ -95,74 +95,89 @@
     >
       Next Step
     </button>
+    <button
+      id="showShut"
+      type="button"
+      class="bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 transition"
+    >
+      show shut
+    </button>
   </div>
 </form>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const toggle = document.getElementById("billingToggle");
-    const monthlyLabel = document.getElementById("monthlyLabel");
-    const yearlyLabel = document.getElementById("yearlyLabel");
-    const plans = document.querySelectorAll(".plan");
-    const goBackBtn = document.getElementById("goBackBtn");
-
-    const prices = {
-      monthly: { arcade: "$9/mo", advanced: "$12/mo", pro: "$15/mo" },
-      yearly: { arcade: "$90/yr", advanced: "$120/yr", pro: "$150/yr" },
-    };
-
-    function updatePricing(isYearly) {
-      plans.forEach((plan) => {
-        const planType = plan.getAttribute("data-plan");
-        const priceElement = plan.querySelector(".price");
-        const yearlyBonusElement = plan.querySelector(".yearly-bonus");
-
-        if (planType && priceElement) {
-          priceElement.textContent = isYearly
-            ? prices.yearly[planType]
-            : prices.monthly[planType];
-        }
-
-        if (yearlyBonusElement) {
-          yearlyBonusElement.classList.toggle("hidden", !isYearly);
-        }
-      });
-
-      monthlyLabel.classList.toggle("font-bold", !isYearly);
-      yearlyLabel.classList.toggle("font-bold", isYearly);
-    }
-
-    function updateSelectedPlan() {
-      plans.forEach((plan) => {
-        plan.classList.remove("border-blue-500");
-      });
-      const selectedPlan = document
-        .querySelector('input[name="plan"]:checked')
-        .closest(".plan");
-      if (selectedPlan) {
-        selectedPlan.classList.add("border-blue-500");
-      }
-    }
-
-    toggle.addEventListener("change", function () {
-      updatePricing(this.checked);
-    });
-
-    plans.forEach((plan) => {
-      plan.addEventListener("click", function () {
-        this.querySelector('input[type="radio"]').checked = true;
-        updateSelectedPlan();
-      });
-    });
-
-    goBackBtn.addEventListener("click", function () {
-      if (currentStep > 1) {
-        loadContent(currentStep - 1);
-      }
-    });
-
-    // Initialize pricing and selected plan on page load
-    updatePricing(toggle.checked);
-    updateSelectedPlan();
+  document.getElementById("showShut").addEventListener("click", () => {
+    console.log("show shut");
   });
+  console.log("Plan Component Loaded");
+
+  console.log("Plan Component Loaded111");
+  const toggle = document.getElementById("billingToggle");
+  console.log(toggle);
+  const monthlyLabel = document.getElementById("monthlyLabel");
+  const yearlyLabel = document.getElementById("yearlyLabel");
+  const plans = document.querySelectorAll(".plan");
+  const goBackBtn = document.getElementById("goBackBtn");
+
+  const prices = {
+    monthly: { arcade: "$9/mo", advanced: "$12/mo", pro: "$15/mo" },
+    yearly: { arcade: "$90/yr", advanced: "$120/yr", pro: "$150/yr" },
+  };
+
+  function updatePricing(isYearly) {
+    plans.forEach((plan) => {
+      const planType = plan.getAttribute("data-plan");
+      const priceElement = plan.querySelector(".price");
+      const yearlyBonusElement = plan.querySelector(".yearly-bonus");
+      console.log(planType);
+      console.log(priceElement);
+      console.log(yearlyBonusElement);
+
+      if (planType && priceElement) {
+        priceElement.textContent = isYearly
+          ? prices.yearly[planType]
+          : prices.monthly[planType];
+      }
+
+      if (yearlyBonusElement) {
+        yearlyBonusElement.classList.toggle("hidden", !isYearly);
+      }
+    });
+
+    monthlyLabel.classList.toggle("font-bold", !isYearly);
+    yearlyLabel.classList.toggle("font-bold", isYearly);
+  }
+
+  function updateSelectedPlan() {
+    plans.forEach((plan) => {
+      plan.classList.remove("border-blue-500");
+    });
+    const selectedPlan = document
+      .querySelector('input[name="plan"]:checked')
+      .closest(".plan");
+    if (selectedPlan) {
+      selectedPlan.classList.add("border-blue-500");
+    }
+  }
+
+  toggle.addEventListener("change", function () {
+    updatePricing(this.checked);
+  });
+
+  plans.forEach((plan) => {
+    plan.addEventListener("click", function () {
+      this.querySelector('input[type="radio"]').checked = true;
+      updateSelectedPlan();
+    });
+  });
+
+  goBackBtn.addEventListener("click", function () {
+    if (currentStep > 1) {
+      loadContent(currentStep - 1);
+    }
+  });
+
+  // Initialize pricing and selected plan on page load
+  updatePricing(toggle.checked);
+  updateSelectedPlan();
 </script>
